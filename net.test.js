@@ -29,7 +29,7 @@ describe("Film booking tests", () => {
     await clickElement(page, "body > nav > a:nth-child(5)"); //выбираем дату
     await clickElement(page, "div:nth-child(2) > ul > li > a"); //выбираем время
     await clickElement(page, "div:nth-child(1) > span:nth-child(10)"); //выбираем место
-    await clickElement(page, "div:nth-child(1) > span:nth-child(9)"); //выбираем место
+    await clickElement(page, "div:nth-child(1) > span:nth-child(9)"); //выбираем 2 место
     await clickElement(page, "body > main > section > button"); // нажимаем забронировать
     await page.waitForSelector("body > main > section > header > h2"); //ждем загрузки страницы
     await clickElement(page, "body > main > section > div > button"); //получить код бронирования
