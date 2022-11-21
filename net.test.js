@@ -1,5 +1,17 @@
 const { Browser } = require("puppeteer");
-const { clickElement, putText, getText } = require("./lib/commands.js");
+const {
+  clickElement,
+  putText,
+  getText,
+  getDays,
+  getMovieTime,
+  getSeatSelector,
+} = require("./lib/commands.js");
+const {
+  bookTickets,
+  selectedTickets,
+  getBookingCode,
+} = require("./lib/selectors");
 
 let page;
 
@@ -14,40 +26,38 @@ afterEach(() => {
 
 describe("Film booking tests", () => {
   test("Should book available ticket", async () => {
-    await clickElement(page, "body > nav > a:nth-child(5)"); //выбираем дату
-    await clickElement(page, "div:nth-child(2) > ul > li > a"); //выбираем время
-    await clickElement(page, "div:nth-child(1) > span:nth-child(1)"); //выбираем место
-    await clickElement(page, "body > main > section > button"); // нажимаем забронировать
-    await page.waitForSelector("body > main > section > header > h2"); //ждем загрузки страницы
-    await clickElement(page, "body > main > section > div > button"); //получить код бронирования
-    const actual = await getText(page, "body > main > section > header > h2");
+    await getDays(page, 5); //выбираем дату
+    await getMovieTime(page, 2, 2); //выбираем время
+    await getSeatSelector(page, 1, 1); //выбираем место
+    await clickElement(page, bookTickets); // нажимаем забронировать
+    await page.waitForSelector(selectedTickets); //ждем загрузки страницы
+    await clickElement(page, getBookingCode); //получить код бронирования
+    const actual = await getText(page, selectedTickets);
 
     expect(actual).toContain("Электронный билет");
   });
 
   test("Should wo tickets be booked", async () => {
-    await clickElement(page, "body > nav > a:nth-child(5)"); //выбираем дату
-    await clickElement(page, "div:nth-child(2) > ul > li > a"); //выбираем время
-    await clickElement(page, "div:nth-child(1) > span:nth-child(10)"); //выбираем место
-    await clickElement(page, "div:nth-child(1) > span:nth-child(9)"); //выбираем 2 место
-    await clickElement(page, "body > main > section > button"); // нажимаем забронировать
-    await page.waitForSelector("body > main > section > header > h2"); //ждем загрузки страницы
-    await clickElement(page, "body > main > section > div > button"); //получить код бронирования
-    const actual = await getText(page, "body > main > section > header > h2");
+    await getDays(page, 5); //выбираем дату
+    await getMovieTime(page, 2, 2); //выбираем время
+    await getSeatSelector(page, 1, 10); //выбираем место
+    await getSeatSelector(page, 1, 9); //выбираем 2 место
+    await clickElement(page, bookTickets); // нажимаем забронировать
+    await page.waitForSelector(selectedTickets); //ждем загрузки страницы
+    await clickElement(page, getBookingCode); //получить код бронирования
+    const actual = await getText(page, selectedTickets);
 
     expect(actual).toContain("Электронный билет");
   });
 
   test("Should try to book unavailable ticket", async () => {
-    await clickElement(page, "body > nav > a:nth-child(5)"); //выбираем дату
-    await clickElement(page, "div:nth-child(2) > ul > li > a"); //выбираем время
-    await clickElement(page, "div:nth-child(1) > span:nth-child(1)"); //выбираем место
+    await getDays(page, 5); //выбираем дату
+    await getMovieTime(page, 2, 2); //выбираем время
+    await getSeatSelector(page, 1, 1); //выбираем место
     expect(
-      String(
-        await page.$eval("button", (button) => {
-          return button.disabled;
-        })
-      )
-    ).toContain("true");
+      await page.$eval("button", (button) => {
+        return button.disabled;
+      })
+    ).toBe(true);
   });
 });

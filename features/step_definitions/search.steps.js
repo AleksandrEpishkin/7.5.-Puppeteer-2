@@ -2,7 +2,13 @@ const puppeteer = require("puppeteer");
 const chai = require("chai");
 const expect = chai.expect;
 const { Given, When, Then, Before, After } = require("@cucumber/cucumber");
-const { clickElement, getText } = require("../../lib/commands.js");
+const {
+  clickElement,
+  getText,
+  getDays,
+  getMovieTime,
+  getSeatSelector,
+} = require("../../lib/commands.js");
 
 Before(async function () {
   const browser = await puppeteer.launch({
@@ -21,38 +27,26 @@ After(async function () {
 });
 
 Given("user enters the page {string}", async function (string) {
-  return await this.page.goto(`${string}`, {
-    setTimeout: 30000,
+  return await this.page.goto(`http://qamid.tmweb.ru${string}`, {
+    setTimeout: 20000,
   });
 });
 
-When("user choose date", async function () {
-  return await clickElement(this.page, "body > nav > a:nth-child(5)");
+When("user choose date {string}", async function (string) {
+  return await getDays(this.page, string);
 });
-When("user choose date that has been choosen earlier", async function () {
-  return await clickElement(this.page, "body > nav > a:nth-child(5)");
-});
-When("user choose time of a movie", async function () {
-  return await clickElement(this.page, "div:nth-child(2) > ul > li > a");
-});
+
 When(
-  "user choose time of a movie that has been chosen earlier",
-  async function () {
-    return await clickElement(this.page, "div:nth-child(2) > ul > li > a");
+  "user choose movie {string} time {string}",
+  async function (string, string2) {
+    return await getMovieTime(this.page, string, string2);
   }
 );
-When("user choose a sit", async function () {
-  return await clickElement(this.page, "div:nth-child(1) > span:nth-child(1)");
+
+When("user choose a sit {string}, {string}", async function (string, string2) {
+  return await getSeatSelector(this.page, string, string2);
 });
-When("user choose a first sit", async function () {
-  return await clickElement(this.page, "div:nth-child(1) > span:nth-child(10)");
-});
-When("user choose a second sit", async function () {
-  return await clickElement(this.page, "div:nth-child(1) > span:nth-child(9)");
-});
-When("user choose a sit that has been chosen earlier", async function () {
-  return await clickElement(this.page, "div:nth-child(1) > span:nth-child(1)");
-});
+
 When("user click on the booking button", async function () {
   return await clickElement(this.page, "body > main > section > button");
 });
